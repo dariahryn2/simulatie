@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>OV Simulatie - Bussie</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #eef;
+      padding: 20px;
+    }
+
+    .passagier {
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .passagier img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .route {
+      height: 120px;
+      background: #ddd;
+      position: relative;
+      margin-top: 30px;
+      overflow: hidden;
+    }
+
+    #bus {
+      position: absolute;
+      top: 20px;
+      width: 100px;
+      right: 0px;
+      transition: right 1s;
+    }
+
+    button {
+      margin-right: 6px;
+      padding: 4px 8px;
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>OV Simulatie: Bussie</h1>
+
+  <div id="passagiers-container"></div>
+
+  <div class="route">
+    <img src="buspng.png" id="bus" alt="Bus">
+  </div>
+
+  <div class="controls">
+    <button onclick="gaVerder()">🚍 Ga verder</button>
+  </div>
+
+  <audio id="checkin-sound" src="check.wav"></audio>
+  <audio id="checkout-sound" src="checkout.wav"></audio>
+
+  <script>
+    const passagiers = [
+      { kaartnummer: 163821, naam: "Leo Daams", saldo: 34, woonplaats: "Den Bosch", foto: "leo.jpg" },
+      { kaartnummer: 145032, naam: "Nicole Hops", saldo: 18, woonplaats: "Maastricht", foto: "nicole.jpg" }
+    ];
+
+    const bus = document.getElementById('bus');
+    let busPos = 0;
+
+    function toonPassagiers() {
+      const container = document.getElementById('passagiers-container');
+      container.innerHTML = "";
+
+      passagiers.forEach(p => {
+        const div = document.createElement('div');
+        div.className = "passagier";
+        div.innerHTML = `
+          <img src="${p.foto}" alt="${p.naam}">
+          <div>
+            <strong>${p.naam}</strong><br>
+            Woonplaats: ${p.woonplaats}<br>
+            Saldo: €${p.saldo.toFixed(2)}<br>
+            <button onclick="checkIn(${p.kaartnummer})">Check-in</button>
+            <button onclick="checkOut(${p.kaartnummer})">Check-out</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function checkIn(kaartnummer) {
+      const p = passagiers.find(p => p.kaartnummer === kaartnummer);
+      if (p) {
+        playCheckInSound();
+        verplaatsBus();
+        toonPassagiers();
+      } else {
+        alert("Passagier niet gevonden.");
+      }
+    }
+
+    function checkOut(kaartnummer) {
+      const p = passagiers.find(p => p.kaartnummer === kaartnummer);
+      if (p) {
+        p.saldo -= 4;
+        playCheckOutSound();
+        verplaatsBus();
+        toonPassagiers();
+      } else {
+        alert("Passagier niet gevonden.");
+      }
+    }
+
+    function playCheckInSound() {
+      const sound = document.getElementById("checkin-sound");
+      sound.currentTime = 0;
+      sound.play();
+    }
+
+    function playCheckOutSound() {
+      const sound = document.getElementById("checkout-sound");
+      sound.currentTime = 0;
+      sound.play();
+    }
+
+    function verplaatsBus() {
+      busPos += 100;
+      if (busPos > 500) busPos = 0;
+      bus.style.right = busPos + "px";
+    }
+
+    function gaVerder() {
+      verplaatsBus();
+    }
+
+    // Start
+    toonPassagiers();
+  </script>
+
+</body>
+</html>
